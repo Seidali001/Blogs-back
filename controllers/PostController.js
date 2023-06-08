@@ -1,0 +1,182 @@
+import PostModel from "../models/Post.js"
+
+export const getAll = async (req, res) => {
+  try {
+const posts = await PostModel.find().populate("user").exec()
+//console.log(posts)
+res.json(posts)
+  } catch (error) {
+      console.log(error)
+      res.status(500).json({
+          /*message: "не удалось получить статьи" */
+          message: "failed to retrieve articles"
+      })
+  }
+}
+
+
+export const getPostsSortedByDate = async (req, res, next) => {
+  try {
+    const sortedPosts = await PostModel.find()
+      .populate("user")
+      .sort({ createdAt: -1 })
+      .exec();
+    const postsWithDate = sortedPosts.map(post => ({
+      ...post._doc,
+      createdAt: new Date(post.createdAt)
+    }));
+    res.json(postsWithDate);
+  } catch (error) {
+    console.warn(error);
+    next(error); // Передача ошибки в следующий обработчик ошибок
+  }
+};
+
+
+export const getPostsSortedByViews = async (req, res) => {
+  try {
+  const sortedPosts = await PostModel.find()
+  .populate("user")
+  .sort({ viewsCount: -1 })
+  .exec();
+  res.json(sortedPosts);
+} catch (error) {
+  console.warn(error);
+  // throw new Error("Не удалось получить сообщения, отсортированные по просмотрам");
+  throw new Error("Failed to fetch posts sorted by views");
+  }
+  };
+
+  export const getPostsByHashTag = async (req, res) => {
+    try {
+      const tag = req.params.tag;
+      const posts = await PostModel.find({ tags: { $in: [tag] } }).populate("user").sort({ createdAt: -1 }).exec();
+      res.json(posts);
+    } catch (error) {
+      console.warn(error);
+      res.status(500).json({
+        message: "Не удалось получить статьи по хэштегу",
+        error: error.message, // Добавляем сообщение об ошибке в ответ
+      });
+      throw new Error("Failed to fetch posts sorted by tags");
+    }
+  };
+  
+
+export const getOne = async (req, res) => {
+  try {
+    const postId = req.params.id;
+    if (!postId) {
+      return res.status(400).json({
+        /* message: "Некорректный идентификатор поста" */
+        message: "Invalid post identifier"
+      });
+    }
+    const doc = await PostModel.findByIdAndUpdate(
+      postId,
+      { $inc: { viewsCount: 1 } },
+      { new: true }
+    ).populate("user");
+
+    if (!doc) {
+      return res.status(404).json({
+          /* message: "статья не найдена" */
+        message: "article not found"
+      });
+    }
+    res.json(doc); 
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      /* message: "не удалось получить статью" */
+      message: "failed to retrieve articles"
+    });
+  }
+};
+  
+
+export const create = async (req, res) => {
+  try {
+const doc = new PostModel({
+  title: req.body.title,
+  text: req.body.text,
+  imageUrl: req.body.imageUrl,
+  tags: req.body.tags.split(","),
+  user: req.userId
+});
+
+const post = await doc.save()
+res.json(post)
+  } catch (error) {
+console.warn(error)
+res.status(500).json({
+  /*message: "не удалось создать статью" */
+  message: "failed to create article"
+})
+  }
+}
+
+export const remove = async (req, res) => {
+    try {
+      const postId = req.params.id;
+      const doc = await PostModel.findOneAndDelete({ _id: postId });
+      if (!doc) {
+        return res.status(404).json({
+            /* message: "статья не найдена" */
+          message: "article not found"
+        });
+      }
+      res.json({
+        success: true
+      });
+    } catch (error) {
+      console.warn(error);
+      res.status(500).json({
+        /* message: "не удалось удалить статью" */
+        message: "failed to delete article"
+      });
+    }
+  };
+
+export const update = async (req, res) => {
+    try {
+        const postId = req.params.id;
+        const doc = await PostModel.updateOne(
+            { 
+                _id: postId 
+            },
+            {
+                title: req.body.title,
+                text: req.body.text,
+                imageUrl: req.body.imageUrl,
+                tags: req.body.tags.split(","),
+                user: req.userId
+            },          
+        )
+          res.json({
+            success: true
+        })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            /*message: "не удалось обновить статью" */
+            message: "failed to update article"
+        })
+    }
+}
+
+
+export const getLastTags = async (req, res) => {
+  try {
+const posts = await PostModel.find().limit(5).exec()
+const tags = posts.map((obj) => obj.tags).flat().slice(0, 5)
+
+res.json(tags)
+  } catch (error) { 
+      console.log(error)
+      res.status(500).json({
+          /*message: "не удалось получить статьи" */
+          message: "failed to retrieve articles"
+      })
+  }
+}
