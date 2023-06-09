@@ -10,15 +10,10 @@ const PostSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    /* tags: {
-        type: Array,
-        default: ["react", "redax", "node"]
-    },  */
     tags: {
-        type: mongoose.Schema.Types.Array, // Используем встроенную схему для массива тегов
-        ref: "Tag",
-        required: true
-      },
+        type: Array,
+        default: []
+    }, 
     viewsCount: {
         type: Number,
         default: 0
