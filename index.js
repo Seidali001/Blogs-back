@@ -6,7 +6,6 @@ import {UserController, PostController} from "./controllers/index.js";
 import {handleValidationErrors, checkAuth} from './utils/index.js';
 import cors from "cors";
 
-
 mongoose.connect("mongodb+srv://adam:55555@blogs.gri2pat.mongodb.net/blogs?retryWrites=true&w=majority")
     .then(() => console.log("DB CONNECTED!"))
     .catch((error) => console.log("DB ERROR!", error)
@@ -52,8 +51,10 @@ app.get('/posts/tags', PostController.getLastTags)
 app.get('/posts', PostController.getAll)
 
 app.post('/posts', checkAuth, postCreateValidation, handleValidationErrors, PostController.create)
+app.post('/posts/:id/comments', checkAuth, handleValidationErrors, PostController.addComment);
 app.delete('/posts/:id', checkAuth, PostController.remove)
 app.patch('/posts/:id', checkAuth, postCreateValidation, handleValidationErrors, PostController.update)
+
 
 app.listen(4444, (error) => {
     if (error) return console.log(error)

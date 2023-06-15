@@ -27,7 +27,6 @@ export const register = async (req, res) => {
             })
 
         const {passwordHash, ...userData} = user._doc
-/* console.log(userData) */
         res.json({
             ...userData,
             token,
@@ -68,8 +67,6 @@ export const login = async (req, res) => {
             })
 
         const {passwordHash, ...userData} = user._doc
-        console.log(userData)
-
         res.json({
             ...userData,
             token
@@ -96,7 +93,6 @@ export const getMe = async (req, res) => {
         }
 
         const {passwordHash, ...userData} = user._doc
-       /*  console.log(userData) */
         res.json(userData)
     }
     catch (error) {
