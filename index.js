@@ -45,8 +45,11 @@ app.get('/tags', PostController.getLastTags)
 
 app.get('/posts/viewCount', PostController.getPostsSortedByViews)
 app.get('/posts/createdAt', PostController.getPostsSortedByDate)
+
 app.get('/posts/:id', PostController.getOne)
+app.get('/posts/user/:id', PostController.getPostsSortedByUser)
 app.get('/posts/tags/:tag', PostController.getPostsByHashTag)
+
 app.get('/posts/tags', PostController.getLastTags)
 app.get('/posts', PostController.getAll)
 
