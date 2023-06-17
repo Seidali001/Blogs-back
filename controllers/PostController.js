@@ -46,6 +46,19 @@ export const getPostsSortedByViews = async (req, res) => {
     }
 };
 
+export const getPostsSortedByUser = async (req, res, next) => {
+    try {
+        const userId = req.params.id;
+        const posts = await PostModel.find().populate("user").exec();
+        const filteredPostsByUser = posts.filter(post => String(post.user._id) === String(userId));
+
+        res.json(filteredPostsByUser);
+    } catch (error) {
+        console.warn(error);
+        next(error);
+    }
+};
+
 export const getPostsByHashTag = async (req, res) => {
     try {
         const tag = req.params.tag;
