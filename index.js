@@ -6,7 +6,7 @@ import {UserController, PostController} from "./controllers/index.js";
 import {handleValidationErrors, checkAuth} from './utils/index.js';
 import cors from "cors";
 
-mongoose.connect("mongodb+srv://adam:55555@blogs.gri2pat.mongodb.net/blogs?retryWrites=true&w=majority")
+mongoose.connect( process.env.MONGODB_URI /*"mongodb+srv://adam:55555@blogs.gri2pat.mongodb.net/blogs?retryWrites=true&w=majority"*/)
     .then(() => console.log("DB CONNECTED!"))
     .catch((error) => console.log("DB ERROR!", error)
     )
@@ -59,7 +59,7 @@ app.delete('/posts/:id', checkAuth, PostController.remove)
 app.patch('/posts/:id', checkAuth, postCreateValidation, handleValidationErrors, PostController.update)
 
 
-app.listen(4444, (error) => {
+app.listen(process.env.PORT || 4444, (error) => {
     if (error) return console.log(error)
     
     console.log("server ok!")
