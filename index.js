@@ -1,12 +1,13 @@
 import express from "express";
 import mongoose from "mongoose";
+import fs from "fs";
 import multer from "multer";
 import {registerValidation, loginValidation, postCreateValidation} from "./validations.js";
 import {UserController, PostController} from "./controllers/index.js";
 import {handleValidationErrors, checkAuth} from './utils/index.js';
 import cors from "cors";
 
-mongoose.connect( process.env.MONGODB_URI /*"mongodb+srv://adam:55555@blogs.gri2pat.mongodb.net/blogs?retryWrites=true&w=majority"*/)
+mongoose.connect(process.env.MONGODB_URI)
     .then(() => console.log("DB CONNECTED!"))
     .catch((error) => console.log("DB ERROR!", error)
     )
@@ -15,6 +16,9 @@ const app = express();
 
 const storage = multer.diskStorage({
     destination: (_, __, callb) => {
+        if(!fs.existsSync("uploads")) {
+            fs.mkdirSync("uploads")
+        }
         callb(null, "uploads")
     },
     filename: (_, file, callb) => {
