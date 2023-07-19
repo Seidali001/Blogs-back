@@ -62,7 +62,7 @@ export const getPostsSortedByUser = async (req, res, next) => {
 export const getPostsByHashTag = async (req, res) => {
     try {
         const tag = req.params.tag;
-        const posts = PostModel.find({tags: {$in: [tag]}}).populate("user").sort({createdAt: -1}).exec();
+        const posts = await PostModel.find({tags: {$in: [tag]}}).populate("user").sort({createdAt: -1}).exec();
         res.json(posts);
     } catch (error) {
         console.warn(error);
